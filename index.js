@@ -21,7 +21,7 @@ module.exports = {
     this._findPretenderPaths();
   },
 
-  treeForVendor: function (tree) {
+  treeForVendor(tree) {
 
     const pretenderTree = new Funnel(this._pretenderDir, {
       files: [path.basename(this._pretenderPath)],
@@ -47,7 +47,7 @@ module.exports = {
     ].filter(Boolean);
 
     return new MergeTrees(trees, {
-      annotation: 'ember-cli-pretender: treeForVendor'
+      annotation: `${addonName}: treeForVendor`
     });
   },
 
@@ -56,9 +56,9 @@ module.exports = {
     if (opts.enabled) {
       this._findPretenderPaths();
 
-      app.import('vendor/fake-xml-http-request/' + path.basename(this._fakeRequestPath));
-      app.import('vendor/route-recognizer/' + path.basename(this._routeRecognizerPath));
-      app.import('vendor/pretender/' + path.basename(this._pretenderPath));
+      app.import(this._fakeRequestPath);
+      app.import(this._routeRecognizerPath);
+      app.import(this._pretenderPath);
     }
   },
 
@@ -76,7 +76,7 @@ module.exports = {
     return tree;
   },
 
-  _excludeSelf (tree) {
+  _excludeSelf(tree) {
     const modulePrefix = this?.app?.modulePrefix;
     if (!modulePrefix) return tree;
 
@@ -86,11 +86,11 @@ module.exports = {
     });
   },
 
-  _emptyTree () {
+  _emptyTree() {
     return new MergeTrees([]);
   },
 
-  _shouldIncludeFiles () {
+  _shouldIncludeFiles() {
     if (process.env.EMBER_CLI_FASTBOOT) return false;
     return this?.app?.env === 'test';
   },
