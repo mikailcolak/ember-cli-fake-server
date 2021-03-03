@@ -2,18 +2,10 @@
 const path = require('path');
 const Funnel = require('broccoli-funnel');
 const MergeTrees = require('broccoli-merge-trees');
-
-const lazyLoaded = {};
-
-function lazyLoad(moduleName){
-  if (!lazyLoaded[moduleName]) {
-    lazyLoaded[moduleName] = require(moduleName);
-  }
-  return lazyLoaded[moduleName];
-}
+const addonName = require('./package').name;
 
 module.exports = {
-  name: require('./package').name,
+  name: addonName,
 
   _findPretenderPaths() {
     if (!this._pretenderPath) {
@@ -70,7 +62,7 @@ module.exports = {
     }
   },
 
-  treeFor() {
+  treeFor(/*type*/) {
     if (this._shouldIncludeFiles()) {
       return this._super.treeFor.apply(this, arguments);
     }
@@ -84,25 +76,22 @@ module.exports = {
     return tree;
   },
 
-  _excludeSelf: function (tree) {
+  _excludeSelf (tree) {
     const modulePrefix = this?.app?.modulePrefix;
-    if (!modulePrefix) {
-      return tree;
-    }
-    const Funnel = lazyLoad('broccoli-funnel');
+    if (!modulePrefix) return tree;
+
     return new Funnel(tree, {
-      exclude: [new RegExp(`^${modulePrefix}/${this.name}/`)],
-      description: `Funnel: exclude ${this.name}`
+      exclude: [new RegExp(`^${modulePrefix}/${addonName}/`)],
+      description: `Funnel: exclude ${addonName}`
     });
   },
 
-  _emptyTree: function () {
-    const mergeTrees = lazyLoad('broccoli-merge-trees');
-    return mergeTrees([]);
+  _emptyTree () {
+    return new MergeTrees([]);
   },
 
-  _shouldIncludeFiles: function () {
+  _shouldIncludeFiles () {
     if (process.env.EMBER_CLI_FASTBOOT) return false;
     return this?.app?.env === 'test';
-  }
+  },
 };
