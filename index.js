@@ -85,7 +85,10 @@ module.exports = {
   },
 
   _excludeSelf: function (tree) {
-    const modulePrefix = this.app.project.config(this.app.env)['modulePrefix'];
+    const modulePrefix = this?.app?.modulePrefix;
+    if (!modulePrefix) {
+      return tree;
+    }
     const Funnel = lazyLoad('broccoli-funnel');
     return new Funnel(tree, {
       exclude: [new RegExp(`^${modulePrefix}/${this.name}/`)],
@@ -100,6 +103,6 @@ module.exports = {
 
   _shouldIncludeFiles: function () {
     if (process.env.EMBER_CLI_FASTBOOT) return false;
-    return this.app.env !== 'production';
+    return this?.app?.env === 'test';
   }
 };
